@@ -1,0 +1,11 @@
+{
+  "name": "Visual Basic 6.0 Mobile IDE",
+  "short_name": "VB6 Mobile IDE",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#808080",
+  "theme_color": "#000080",
+  "description": "Offline, Windows 98-inspired Visual Basic-style mobile IDE."
+}
