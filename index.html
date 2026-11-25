@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#000080"><link rel="manifest" href="manifest.json">
+<title>Microsoft Visual Basic 6.0 - Mobile IDE</title>
+<style>
+:root{--face:#c0c0c0;--navy:#000080;--blue:#1084d0}
+*{box-sizing:border-box}html,body{height:100%;margin:0;overflow:hidden;background:#808080;color:#000;font:12px Tahoma,Arial,sans-serif}
+button,input,select,textarea{font:inherit;border-radius:0}button{background:var(--face);border:2px solid;border-color:#fff #000 #000 #fff;padding:5px 9px;min-height:29px}button:active{border-color:#000 #fff #fff #000}
+#menubar,#toolbar,#status{background:var(--face);display:flex;align-items:center;gap:4px;padding:4px;white-space:nowrap;overflow:auto}#menubar{height:29px;border-bottom:1px solid #777}#toolbar{height:38px;border-bottom:1px solid #777}#workspace{position:relative;height:calc(100% - 91px);background:#808080;overflow:hidden}
+.win{position:absolute;background:var(--face);border:2px solid;border-color:#fff #000 #000 #fff;display:flex;flex-direction:column;box-shadow:1px 1px #000}
+.bar{background:linear-gradient(90deg,var(--navy),var(--blue));color:#fff;font-weight:bold;padding:5px;min-height:25px;touch-action:none}
+.body{padding:6px;overflow:auto;flex:1}.toolbox{left:5px;top:5px;width:120px;bottom:5px}.designer{left:132px;right:5px;top:5px;bottom:5px}
+#canvas{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(520px,95%);height:min(350px,90%);background:#c0c0c0;border:2px solid;border-color:#fff #000 #000 #fff}
+#formhead{height:23px;background:linear-gradient(90deg,#000080,#1084d0);color:#fff;padding:4px;font-weight:bold}
+#forminner{position:absolute;inset:23px 0 0;background-image:radial-gradient(#888 .7px,transparent .8px);background-size:8px 8px}
+.control{position:absolute;min-width:48px;min-height:26px;padding:4px;background:#c0c0c0;border:1px solid #000}
+#codewin{display:none;inset:5% 3%;z-index:10}.codearea{width:100%;height:100%;resize:none;border:2px inset #aaa;background:#fff;font:14px/1.4 monospace;padding:8px}
+#status{height:24px;border-top:1px solid #fff}#dialog{display:none;position:absolute;inset:0;background:#0007;z-index:20;align-items:center;justify-content:center}.dialogbox{background:#c0c0c0;border:2px solid;border-color:#fff #000 #000 #fff;width:min(420px,92vw);padding:12px}
+@media(max-width:600px){.toolbox{width:104px}.designer{left:112px}.control{font-size:11px}}
+</style></head><body>
+<div id="menubar"><span>File</span><span>Edit</span><span>View</span><span>Project</span><span>Format</span><span>Run</span><span>Tools</span><span>Window</span><span>Help</span></div>
+<div id="toolbar"><button onclick="newProject()">New</button><button onclick="saveProject()">Save</button><button onclick="openProject()">Open</button><button onclick="showCode()">View Code</button><button onclick="runProject()">▶ Run (F5)</button><button onclick="stopProject()">■ Stop</button></div>
+<div id="workspace">
+<section class="win toolbox"><div class="bar">Toolbox</div><div class="body" id="tools"><button onclick="addControl('Label')">Label</button><button onclick="addControl('TextBox')">TextBox</button><button onclick="addControl('CommandButton')">CommandButton</button><button onclick="addControl('CheckBox')">CheckBox</button><button onclick="addControl('OptionButton')">OptionButton</button><button onclick="addControl('ListBox')">ListBox</button><button onclick="addControl('PictureBox')">PictureBox</button><button onclick="addControl('Frame')">Frame</button></div></section>
+<section class="win designer"><div class="bar" id="designerTitle">Project1 - Form1 (Form)</div><div class="body" id="designbody"><div id="canvas"><div id="formhead">Form1</div><div id="forminner"></div></div></div></section>
+<section class="win" id="codewin"><div class="bar">Project1 - Form1 (Code) <button style="float:right" onclick="hideCode()">X</button></div><div class="body" style="display:flex"><textarea id="code" class="codearea" spellcheck="false">Option Explicit
+
+Private Sub Form_Load()
+    Me.Caption = "Hello, Visual Basic!"
+End Sub
+
+Private Sub Command1_Click()
+    MsgBox "Hello from VB6 Mobile IDE!"
+End Sub</textarea></div></section>
+</div><div id="status"><span id="mode">Design</span><span style="margin-left:auto">Ready</span></div>
+<div id="dialog"><div class="dialogbox"><h3 id="dtitle">Visual Basic</h3><div id="dtext"></div><p style="text-align:right"><button onclick="closeDialog()">OK</button></p></div></div>
+<script>
+const $=s=>document.querySelector(s);let count=0,projectName="Project1",selected=null;
+function dialog(t,m){$("#dtitle").textContent=t;$("#dtext").textContent=m;$("#dialog").style.display="flex"}function closeDialog(){$("#dialog").style.display="none"}
+function newProject(){if(confirm("Create a new Standard EXE project?")){$("#forminner").innerHTML="";count=0;projectName="Project1";$("#formhead").textContent="Form1";$("#code").value='Option Explicit\n\nPrivate Sub Form_Load()\n    Me.Caption = "Hello, Visual Basic!"\nEnd Sub\n';}}
+function addControl(type){count++;let el=document.createElement("div");el.className="control";el.textContent=type==="CommandButton"?"Command"+count:type+count;el.style.left=(15+(count%4)*75)+"px";el.style.top=(15+Math.floor((count-1)/4)*42)+"px";el.dataset.type=type;el.onclick=()=>{selected=el;dialog("Selected control",el.textContent+" — drag is available in the designer.")};el.onpointerdown=e=>{let x=e.clientX,y=e.clientY,l=el.offsetLeft,t=el.offsetTop;el.setPointerCapture(e.pointerId);el.onpointermove=v=>{el.style.left=(l+v.clientX-x)+"px";el.style.top=(t+v.clientY-y)+"px"};el.onpointerup=()=>el.onpointermove=null};$("#forminner").append(el)}
+function showCode(){$("#codewin").style.display="flex"}function hideCode(){$("#codewin").style.display="none"}
+function saveProject(){let d={name:projectName,code:$("#code").value,controls:[...$("#forminner").children].map(e=>({text:e.textContent,type:e.dataset.type,left:e.style.left,top:e.style.top}))};localStorage.setItem("vb6mobile-project",JSON.stringify(d));dialog("Project saved","Saved locally in this browser.")}
+function openProject(){let s=localStorage.getItem("vb6mobile-project");if(!s)return dialog("Open Project","No locally saved project found.");let d=JSON.parse(s);projectName=d.name;$("#code").value=d.code;$("#forminner").innerHTML="";d.controls.forEach(c=>{addControl(c.type);let e=$("#forminner").lastElementChild;e.textContent=c.text;e.style.left=c.left;e.style.top=c.top});dialog("Open Project","Project restored from local storage.")}
+function runProject(){let src=$("#code").value;let msg=(src.match(/MsgBox\s+"([^"]*)"/i)||[])[1];let cap=(src.match(/Me\.Caption\s*=\s*"([^"]*)"/i)||[])[1]||"Project running";$("#mode").textContent="Run";dialog(cap,msg||"Program started. This mobile edition runs a limited VB-style demo, not the full VB6 runtime.");}
+function stopProject(){$("#mode").textContent="Design";closeDialog()}
+document.addEventListener("keydown",e=>{if(e.key==="F5"){e.preventDefault();runProject()}if(e.ctrlKey&&e.key.toLowerCase()==="s"){e.preventDefault();saveProject()}if(e.key==="Escape"){hideCode();closeDialog()}});
+if("serviceWorker"in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("./sw.js").catch(()=>{});
+</script></body></html>
